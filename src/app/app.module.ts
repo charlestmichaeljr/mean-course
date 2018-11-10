@@ -16,7 +16,6 @@ import {
 import { HeaderComponent } from './posts/header/header.component';
 import { PostListComponent } from './posts/post-list/post-list.component';
 import {HttpClientModule} from '@angular/common/http';
-import {RouterModule} from '@angular/router';
 import {AppRoutingModule} from './app-routing.module';
 
 @NgModule({
