@@ -1,19 +1,47 @@
 const express = require('express');
 const Post = require('../models/post');
+const multer = require('multer');
 const router = express.Router();
+const MIME_TYPE_MAP = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg'
+};
+const storage = multer.diskStorage({
+  destination: (req,file,callback) => {
+    const isValid = MIME_TYPE_MAP[file.mimetype];
+    let error = new Error('Invalid mime type of ' + file.mimetype);
+    if(isValid) {
+      error = null;
+    }
+    callback(error,'backend/images')
+  },
+  filename: (req,file,callback) => {
+    const name = file.originalname.toLowerCase().split(' ').join('-');
+    const ext = MIME_TYPE_MAP[file.mimetype];
+    callback(null, name + '-' + Date.now() + '.' + ext);
+  }
+})
 
-router.post('',(req,resp,next)=>{
+router.post('',multer({storage: storage}).single('image'),(req,resp,next)=>{
 
+  const url = req.protocol + '://' + req.get('host');
   const post = new Post({
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: url + '/images/' + req.file.filename
   })
   console.log(post);
   post.save().then(createdPost => {
     console.log("Result of add is " + createdPost);
     resp.status(201).json({
       message: 'Successfully added',
-      postId: createdPost._id
+      post: {
+        id: createdPost._id,
+        title: createdPost.title,
+        content: createdPost.content,
+        imagePath: createdPost.imagePath
+      }
     })
   });
 
