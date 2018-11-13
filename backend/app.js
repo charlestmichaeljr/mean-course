@@ -2,11 +2,12 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const postRoutes = require('./routes/posts')
+const postRoutes = require('./routes/posts');
+const userRoutes = require('./routes/user');
 
 const app = express();
 
-mongoose.connect('mongodb+srv://charlie:o5jMlvsgJiETbw8B@cluster0-18tz9.mongodb.net/node-angular?retryWrites=true')
+mongoose.connect('mongodb+srv://charlie:o5jMlvsgJiETbw8B@cluster0-18tz9.mongodb.net/node-angular')
   .then(()=>{console.log('Connected to the database')})
   .catch(()=>{console.log('Error connecting to the database')})
 // Password is o5jMlvsgJiETbw8B
@@ -24,6 +25,7 @@ app.use((req,resp,next)=>{
 });
 
 app.use('/api/posts',postRoutes);
+app.use('/api/user',userRoutes)
 
 // export the app to be used by node js
 module.exports = app;
