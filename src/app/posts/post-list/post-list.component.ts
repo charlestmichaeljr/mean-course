@@ -2,6 +2,7 @@ import {Component, OnInit, Input, OnDestroy} from '@angular/core';
 import {Post} from '../post.model';
 import {PostsService} from '../posts.service';
 import {Subscription} from 'rxjs';
+import {PageEvent} from '@angular/material';
 
 @Component({
   selector: 'app-post-list',
@@ -12,6 +13,11 @@ export class PostListComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
   private postsSub: Subscription;
   isLoading = false;
+  totalPosts = 0;
+  postsPerPage = 2;
+  pageSizeOptions = [2, 4, 6, 8, 10];
+  currentPage = 1;
+
 
   constructor(public postsService: PostsService) {
 
@@ -19,12 +25,20 @@ export class PostListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.isLoading = true;
-    this.postsService.getPosts();
+    this.postsService.getPosts( this.postsPerPage , this.currentPage);
     this.postsSub = this.postsService.getPostUpdateListener()
-      .subscribe((posts: Post[]) => {
-        this.isLoading = false;
-        this.posts = posts;
+      .subscribe((postData: {posts: Post[], postCount: number}) => {
+        this.isLoading = false; // always turns off the spinner after return from service.
+        this.posts = postData.posts;
+        this.totalPosts = postData.postCount;
     });
+  }
+
+  onChangedPage(pageData: PageEvent) {
+    this.isLoading = true;
+    this.currentPage = pageData.pageIndex + 1;
+    this.postsPerPage = pageData.pageSize;
+    this.postsService.getPosts( this.postsPerPage , this.currentPage);
   }
 
   ngOnDestroy(): void {
@@ -32,7 +46,10 @@ export class PostListComponent implements OnInit, OnDestroy {
   }
 
   onDelete(id: string) {
-    this.postsService.deletePost(id);
+    this.isLoading = true;
+    this.postsService.deletePost(id).subscribe(() => {
+      this.postsService.getPosts(this.postsPerPage, this.currentPage);
+    });
   }
 
 }
