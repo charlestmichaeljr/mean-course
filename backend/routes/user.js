@@ -53,7 +53,10 @@ router.post("/login", (req, resp, next) => {
       const token = jwt.sign({ email: fetchedUser.email, userId: fetchedUser._id},
         'Now_is_the_time_for_all_good_men_to_come_to_the_aid_of_their_party',
         {expiresIn: '1h'});
-      resp.status(200).json({token: token});
+      resp.status(200).json({
+          token: token,
+          expiresIn: 3600
+      });
     })
     .catch(err => {
       console.log(err)

@@ -32,9 +32,11 @@ router.post('',
         const post = new Post({
             title: req.body.title,
             content: req.body.content,
-            imagePath: url + '/images/' + req.file.filename
+            imagePath: url + '/images/' + req.file.filename,
+            creator: req.userData.userId
         })
-        console.log(post);
+        console.log('User Data: ' + req.userData);
+        //return resp.status(200).json({});
         post.save().then(createdPost => {
             console.log("Result of add is " + createdPost);
             resp.status(201).json({
@@ -43,7 +45,8 @@ router.post('',
                     id: createdPost._id,
                     title: createdPost.title,
                     content: createdPost.content,
-                    imagePath: createdPost.imagePath
+                    imagePath: createdPost.imagePath,
+                    creator: createdPost.creator
                 }
             })
         });
@@ -65,10 +68,16 @@ router.put('/:id',
             content: req.body.content,
             imagePath: imagePath
         });
-        Post.updateOne({_id: req.params.id}, post)
+        // only deletes if you have the same id and creator as what is on the database
+        Post.updateOne({_id: req.params.id, creator: req.userData.userId}, post)
             .then(result => {
                 console.log(result);
-                resp.status(200).json({message: 'Record updated'});
+                if(result.nModified > 0) {
+                    resp.status(200).json({message: 'Record updated'});
+                } else {
+                    resp.status(401).json({message: 'Not authorized!'})
+                }
+
             });
     })
 
@@ -113,11 +122,15 @@ router.delete('/:id',
                             // of the code will be bypassed.
     (req, resp, next) => {
         console.log('ID to be deleted is ' + req.params.id);
-        Post.deleteOne({_id: req.params.id}).then(result => {
+        // only deletes if you have the same id and creator as what is on the database
+        Post.deleteOne({_id: req.params.id, creator: req.userData.userId }).then(result => {
             console.log(result);
-            resp.status(200).json({message: 'Post deleted'});
+            if(result.n > 0) {
+                resp.status(200).json({message: 'Post Deleted'});
+            } else {
+                resp.status(401).json({message: 'Not authorized!'})
+            }
         });
-
     })
 
 module.exports = router;
