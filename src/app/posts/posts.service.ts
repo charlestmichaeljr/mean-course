@@ -4,6 +4,7 @@ import {Subject} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 import {Router} from '@angular/router';
+import {environment} from '../../environments/environment';
 
 @Injectable({providedIn: 'root'})
 export class PostsService {
@@ -11,12 +12,14 @@ export class PostsService {
     private posts: Post[] = [];
     private postsUpdated = new Subject<{ posts: Post[], postCount: number }>();
 
+    private BACKEND_URL = environment.apiUrl +  '/posts/';
+
     constructor(private httpClient: HttpClient, private router: Router) {
     }
 
     getPosts(postsPerPage: number, currentPage: number) {
         const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
-        this.httpClient.get<{ message: string, posts: any, maxPosts: number }>('http://localhost:3000/api/posts' + queryParams)
+        this.httpClient.get<{ message: string, posts: any, maxPosts: number }>(this.BACKEND_URL + queryParams)
             .pipe(map((postData) => {
                 return {
                     posts: postData.posts.map(post => {
@@ -44,7 +47,7 @@ export class PostsService {
             content: string,
             imagePath: string,
             creator: string
-        }>('http://localhost:3000/api/posts/' + id);
+        }>(this.BACKEND_URL + id);
     }
 
     getPostUpdateListener() {
@@ -57,14 +60,14 @@ export class PostsService {
         postData.append('content', content);
         postData.append('image', image, title);
 
-        this.httpClient.post<{ message: string, post: Post }>('http://localhost:3000/api/posts', postData)
+        this.httpClient.post<{ message: string, post: Post }>(this.BACKEND_URL, postData)
             .subscribe((responseData) => {
                 this.router.navigate(['/']); // navigating to this route will re-fetch the data in ngOnInit()
             });
     }
 
     deletePost(postId: string) {
-        return this.httpClient.delete<{ message: string }>('http://localhost:3000/api/posts/' + postId);
+        return this.httpClient.delete<{ message: string }>(this.BACKEND_URL + postId);
 
     }
 
@@ -85,7 +88,7 @@ export class PostsService {
                 creator: null
             };
         }
-        this.httpClient.put('http://localhost:3000/api/posts/' + id, postData)
+        this.httpClient.put(this.BACKEND_URL + id, postData)
             .subscribe(response => {
                 this.router.navigate(['/']); // navigating to this route will re-fetch the data in ngOnInit()
             });

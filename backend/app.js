@@ -7,7 +7,7 @@ const userRoutes = require('./routes/user');
 
 const app = express();
 
-mongoose.connect('mongodb+srv://charlie:o5jMlvsgJiETbw8B@cluster0-18tz9.mongodb.net/node-angular')
+mongoose.connect('mongodb+srv://charlie:' + process.env.MONGO_ATLAS_PASSWORD +'@cluster0-18tz9.mongodb.net/node-angular')
   .then(()=>{console.log('Connected to the database')})
   .catch(()=>{console.log('Error connecting to the database')})
 // Password is o5jMlvsgJiETbw8B
