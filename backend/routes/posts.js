@@ -49,7 +49,12 @@ router.post('',
                     creator: createdPost.creator
                 }
             })
-        });
+        })
+            .catch(ex => {
+                resp.status(500).json({
+                    message: 'Creating a post failed'
+                })
+            });
 
     })
 
@@ -66,7 +71,8 @@ router.put('/:id',
             _id: req.body.id,
             title: req.body.title,
             content: req.body.content,
-            imagePath: imagePath
+            imagePath: imagePath,
+            creator: req.userData.userId
         });
         // only deletes if you have the same id and creator as what is on the database
         Post.updateOne({_id: req.params.id, creator: req.userData.userId}, post)
@@ -78,6 +84,11 @@ router.put('/:id',
                     resp.status(401).json({message: 'Not authorized!'})
                 }
 
+            })
+            .catch(ex => {
+                resp.status(500).json({
+                    message: 'Error updating your post'
+                });
             });
     })
 
@@ -104,6 +115,11 @@ router.get('', (req, resp, next) => {
                 maxPosts: postCount
             })
         })
+        .catch(ex => {
+            resp.status(500).json({
+                message: 'Error getting posts'
+            })
+        })
 })
 
 router.get('/:id', (req, resp, next) => {
@@ -114,6 +130,11 @@ router.get('/:id', (req, resp, next) => {
             } else {
                 resp.status(404).json({message: 'Post not found'})
             }
+        })
+        .catch(ex => {
+            resp.status(500).json({
+                message: 'Error getting single post'
+            })
         })
 })
 
@@ -130,7 +151,12 @@ router.delete('/:id',
             } else {
                 resp.status(401).json({message: 'Not authorized!'})
             }
-        });
+        })
+            .catch(ex => {
+                resp.status(500).json({
+                    message: 'Error deleting a post'
+                })
+            });
     })
 
 module.exports = router;

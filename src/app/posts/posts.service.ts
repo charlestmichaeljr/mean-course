@@ -42,7 +42,9 @@ export class PostsService {
             _id: string,
             title: string,
             content: string,
-            imagePath: string }>('http://localhost:3000/api/posts/' + id);
+            imagePath: string,
+            creator: string
+        }>('http://localhost:3000/api/posts/' + id);
     }
 
     getPostUpdateListener() {
@@ -79,7 +81,8 @@ export class PostsService {
                 id: id,
                 title: title,
                 content: content,
-                imagePath: image
+                imagePath: image,
+                creator: null
             };
         }
         this.httpClient.put('http://localhost:3000/api/posts/' + id, postData)

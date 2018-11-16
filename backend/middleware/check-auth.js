@@ -8,7 +8,7 @@ module.exports = (req,resp,next) => {
         next();
     }
     catch(error) {
-        resp.status(401).json({message: 'Error getting authentication token'})
+        resp.status(401).json({message: 'You are not authenticated'})
     }
 
 }
