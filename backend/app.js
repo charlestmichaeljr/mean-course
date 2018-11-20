@@ -15,7 +15,7 @@ mongoose.connect('mongodb+srv://charlie:' + process.env.MONGO_ATLAS_PASSWORD +'@
 // use the body parser package to parse Http Request Bodies
 app.use( bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-app.use('/images',express.static(path.join('backend/images')));
+app.use('/images',express.static(path.join('images')));
 
 app.use((req,resp,next)=>{
   resp.setHeader('Access-Control-Allow-Origin','*');
